@@ -20,107 +20,107 @@
     }
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
-  html,body{margin:0; padding:0}
+  html,body{margin:0; padding:0; height:100%}
   body{
     background:var(--bg); color:var(--text);
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
     font-size:16px; line-height:1.45;
-    padding-bottom:calc(64px + env(safe-area-inset-bottom));
+    display:flex; flex-direction:column; height:100dvh; overflow:hidden;
   }
   header{
-    position:sticky; top:0; z-index:20;
-    background:var(--card); border-bottom:1px solid var(--border);
-    padding:10px 14px;
+    flex:0 0 auto; background:var(--card); border-bottom:1px solid var(--border);
+    padding:9px 14px; z-index:20;
   }
-  header h1{font-size:18px; margin:0 0 2px}
+  header h1{font-size:17px; margin:0 0 1px}
   .summary{font-size:13px; color:var(--muted)}
   .summary b{color:var(--text)}
-  .updated{font-size:12px; color:var(--muted); margin-top:2px}
+  .updated{font-size:11.5px; color:var(--muted)}
+  main{flex:1 1 auto; min-height:0; position:relative}
+  main.scrollable{overflow-y:auto; padding:12px 12px 26px}
+  main.scrollable .inner{max-width:860px; margin:0 auto}
   button{
     font:inherit; cursor:pointer; border:1px solid var(--border);
     background:var(--card); color:var(--text); border-radius:10px;
     padding:10px 14px; min-height:44px;
   }
   button:active{transform:scale(.97)}
-  main{padding:12px 12px 26px; max-width:860px; margin:0 auto}
   .state{text-align:center; color:var(--muted); padding:44px 20px; font-size:15px}
   .state .big{font-size:17px; color:var(--text); font-weight:600; margin-bottom:6px}
 
-  /* ===== Deck (Tinder) ===== */
-  .deckwrap{max-width:560px; margin:0 auto}
-  .deckmeta{display:flex; justify-content:space-between; align-items:center; font-size:13.5px; color:var(--muted); margin:2px 2px 10px}
-  .deckmeta button{min-height:36px; padding:6px 12px; font-size:13.5px}
-  .stage{position:relative; min-height:200px}
-  .dcard{
-    background:var(--card); border:1px solid var(--border); border-radius:18px;
-    overflow:hidden; box-shadow:0 8px 28px rgba(0,0,0,.10);
-    touch-action:pan-y; user-select:none; -webkit-user-select:none;
-    will-change:transform;
+  /* ===== Feed kiểu TikTok ===== */
+  .feed{
+    position:absolute; inset:0; overflow-y:auto;
+    scroll-snap-type:y mandatory; scrollbar-width:none;
   }
-  .dcard.behind{position:absolute; inset:0; transform:scale(.95) translateY(10px); z-index:-1; box-shadow:none}
-  .photo{position:relative; background:var(--chip); aspect-ratio:4/3; overflow:hidden}
-  .photo img{width:100%; height:100%; object-fit:cover; display:block; pointer-events:none}
-  .photo .nophoto{
-    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  .feed::-webkit-scrollbar{display:none}
+  .slide{
+    height:100%; scroll-snap-align:start; scroll-snap-stop:always;
+    display:flex; flex-direction:column;
+    background:var(--card); max-width:640px; margin:0 auto;
+    border-left:1px solid var(--border); border-right:1px solid var(--border);
+  }
+  .strip{
+    flex:0 0 47%; position:relative; display:flex; overflow-x:auto;
+    scroll-snap-type:x mandatory; scrollbar-width:none; background:var(--chip);
+  }
+  .strip::-webkit-scrollbar{display:none}
+  .strip .ph{flex:0 0 100%; scroll-snap-align:start; scroll-snap-stop:always; position:relative}
+  .strip .ph img{width:100%; height:100%; object-fit:cover; display:block}
+  .strip .nophoto{
+    flex:0 0 100%; display:flex; align-items:center; justify-content:center;
     color:var(--muted); font-size:15px; padding:20px; text-align:center;
   }
-  .photo .count{
-    position:absolute; right:10px; top:10px; background:rgba(0,0,0,.55); color:#fff;
-    font-size:12.5px; border-radius:999px; padding:3px 10px;
+  .pcount{
+    position:absolute; right:12px; top:10px; z-index:5;
+    background:rgba(0,0,0,.55); color:#fff; font-size:12.5px;
+    border-radius:999px; padding:3px 10px; pointer-events:none;
   }
-  .photo .nav{
-    position:absolute; top:50%; transform:translateY(-50%);
-    width:42px; height:42px; border-radius:50%; border:none;
-    background:rgba(0,0,0,.45); color:#fff; font-size:22px; line-height:1;
-    display:flex; align-items:center; justify-content:center; min-height:42px; padding:0;
+  .pdots{
+    position:absolute; left:0; right:0; bottom:8px; z-index:5;
+    display:flex; gap:5px; justify-content:center; pointer-events:none;
   }
-  .photo .nav.prev{left:8px} .photo .nav.next{right:8px}
-  .photo .dots{position:absolute; left:0; right:0; bottom:8px; display:flex; gap:5px; justify-content:center}
-  .photo .dots i{width:7px; height:7px; border-radius:50%; background:rgba(255,255,255,.55)}
-  .photo .dots i.on{background:#fff}
-  .stamp{
-    position:absolute; top:16px; font-size:21px; font-weight:800; letter-spacing:.5px;
-    border:3px solid; border-radius:10px; padding:3px 12px; opacity:0; pointer-events:none;
-    background:rgba(255,255,255,.85);
-  }
-  .stamp.save{left:14px; color:var(--ok); border-color:var(--ok); transform:rotate(-12deg)}
-  .stamp.pass{right:14px; color:var(--danger); border-color:var(--danger); transform:rotate(12deg)}
-  .dbody{padding:13px 15px 15px}
-  .dprice{font-size:23px; font-weight:800; line-height:1.15}
-  .dperm2{font-size:13.5px; color:var(--muted); font-weight:500}
-  .dtitle{font-size:16.5px; font-weight:600; margin:7px 0 4px}
-  .dmeta{font-size:14px; color:var(--muted); display:flex; flex-wrap:wrap; gap:3px 12px}
-  .dnote{font-size:15px; margin-top:8px; white-space:pre-wrap}
+  .pdots i{width:7px; height:7px; border-radius:50%; background:rgba(255,255,255,.55)}
+  .pdots i.on{background:#fff}
+  .sinfo{flex:1 1 auto; overflow-y:auto; padding:12px 15px 8px; min-height:0}
+  .sprice{font-size:23px; font-weight:800; line-height:1.15}
+  .sperm2{font-size:13.5px; color:var(--muted); font-weight:500}
+  .stitle{font-size:16.5px; font-weight:600; margin:6px 0 4px}
+  .smeta{font-size:14px; color:var(--muted); display:flex; flex-wrap:wrap; gap:3px 12px}
+  .snote{font-size:15px; margin-top:8px; white-space:pre-wrap}
   .badge-loai{
     display:inline-block; background:var(--danger); color:#fff;
     font-size:12px; font-weight:700; border-radius:7px; padding:3px 8px; margin-left:8px; vertical-align:3px;
   }
-  .dactions{display:flex; gap:10px; margin-top:14px}
-  .dactions a{
-    flex:1; text-align:center; text-decoration:none; font-weight:600;
-    border-radius:10px; padding:11px 6px; min-height:46px;
-    display:flex; align-items:center; justify-content:center; font-size:14.5px;
+  .sbar{
+    flex:0 0 auto; display:flex; align-items:flex-end; gap:8px;
+    padding:9px 12px calc(9px + env(safe-area-inset-bottom) * 0);
+    border-top:1px solid var(--border); background:var(--card);
+  }
+  .contacts{display:flex; gap:7px; flex:1; min-width:0}
+  .contacts a{
+    text-decoration:none; font-weight:600; font-size:14px;
+    border-radius:10px; padding:11px 10px; min-height:46px;
+    display:flex; align-items:center; justify-content:center; white-space:nowrap;
   }
   .a-fb{background:var(--accent); color:#fff}
   .a-call{background:var(--chip); color:var(--text); border:1px solid var(--border)}
   .a-zalo{background:var(--zalo); color:#fff}
-  .swipebar{
-    display:flex; justify-content:center; align-items:center; gap:18px; margin-top:16px;
+  .decisions{display:flex; gap:10px; margin-left:auto}
+  .dbtn{display:flex; flex-direction:column; align-items:center; gap:2px}
+  .dbtn button{
+    width:52px; height:52px; min-height:52px; border-radius:50%; padding:0;
+    font-size:23px; line-height:1; display:flex; align-items:center; justify-content:center;
+    box-shadow:0 3px 10px rgba(0,0,0,.10);
   }
-  .sbtn{
-    width:62px; height:62px; border-radius:50%; font-size:26px; line-height:1;
-    display:flex; align-items:center; justify-content:center; padding:0; min-height:62px;
-    box-shadow:0 4px 14px rgba(0,0,0,.12);
-  }
-  .sbtn.pass{color:var(--danger); border-color:var(--danger)}
-  .sbtn.save{color:var(--ok); border-color:var(--ok); width:70px; height:70px; min-height:70px; font-size:30px}
-  .sbtn.star{color:var(--star); border-color:var(--star)}
-  .sbtn.star.on{background:var(--star); color:#fff}
-  .swipelabels{display:flex; justify-content:center; gap:18px; margin-top:6px; font-size:12px; color:var(--muted)}
-  .swipelabels span{width:62px; text-align:center}
-  .swipelabels span.mid{width:70px}
+  .dbtn span{font-size:10.5px; color:var(--muted)}
+  .dbtn.pass button{color:var(--danger); border-color:var(--danger)}
+  .dbtn.star button{color:var(--star); border-color:var(--star)}
+  .dbtn.star.on button{background:var(--star); color:#fff}
+  .dbtn.save button{color:var(--ok); border-color:var(--ok)}
+  .dbtn.save.on button{background:var(--ok); color:#fff}
+  .endslide{align-items:center; justify-content:center; text-align:center; padding:30px}
 
-  /* ===== List ===== */
+  /* ===== List / Đã lưu ===== */
   .searchrow{display:flex; gap:8px; margin:4px 0 10px}
   .searchrow input[type=search]{
     flex:1; min-width:0; font-size:16px; padding:11px 12px;
@@ -174,12 +174,12 @@
     display:flex; align-items:center; justify-content:center;
   }
   .mini{font-size:13px; color:var(--muted); margin-top:8px}
+  .foot{color:var(--muted); font-size:12.5px; padding:6px 2px 10px}
 
   /* ===== Bottom tabs ===== */
   nav.tabs{
-    position:fixed; left:0; right:0; bottom:0; z-index:30;
-    background:var(--card); border-top:1px solid var(--border);
-    display:flex; padding-bottom:env(safe-area-inset-bottom);
+    flex:0 0 auto; background:var(--card); border-top:1px solid var(--border);
+    display:flex; padding-bottom:env(safe-area-inset-bottom); z-index:20;
   }
   nav.tabs button{
     flex:1; border:none; background:none; border-radius:0; min-height:56px;
@@ -188,7 +188,6 @@
   }
   nav.tabs button .ic{font-size:21px; line-height:1}
   nav.tabs button.on{color:var(--accent); font-weight:700}
-  footer{max-width:860px; margin:0 auto; padding:0 16px 20px; color:var(--muted); font-size:12.5px}
 </style>
 </head>
 <body>
@@ -200,13 +199,8 @@
 
 <main id="view"></main>
 
-<footer>
-  Dữ liệu đọc trực tiếp từ Google Sheet “Tìm nhà Hà Nội — Nino 2026”, tab “Nhà trên Facebook” (cột Ảnh lấy link ảnh từ Sheet).
-  Lượt vuốt / lưu / sao được lưu trên chính thiết bị đang xem.
-</footer>
-
 <nav class="tabs">
-  <button id="tabDeck" type="button"><span class="ic">🂡</span>Vuốt xem</button>
+  <button id="tabFeed" type="button"><span class="ic">▶</span>Xem</button>
   <button id="tabSaved" type="button"><span class="ic">♥</span>Đã lưu</button>
   <button id="tabList" type="button"><span class="ic">☰</span>Danh sách</button>
 </nav>
@@ -217,12 +211,12 @@
 const SHEET_ID = "1Te44C8dwth9vSWuEX1BxI0s3V_sWi-OgSajlrIZtEa8";
 const TAB_NAME = "Nhà trên Facebook";
 /* Cột Sheet: A Giá | B Ngày đăng | C Tiêu đề | D Diện tích | E Khu vực | F SĐT |
-   G Ghi chú | H Link | I Đã nhắn | J Đã check | K Comment | L Ảnh (link, cách nhau bởi dấu cách/xuống dòng) */
+   G Ghi chú | H Link | I Đã nhắn | J Đã check | K Comment | L Ảnh (các link cách nhau bởi khoảng trắng) */
 
 const state = {
-  houses: [], tab: "deck",
-  q: "", area: "", maxPrice: null, sort: "rank", hideLoai: false,
-  photoIdx: 0, history: []
+  houses: [], tab: "feed",
+  q: "", area: "", maxPrice: null, sort: "rank", hideLoai: false, filtersOpen: false,
+  feedIdx: 0
 };
 
 /* ===== Lưu trên thiết bị: bỏ qua / đã lưu / sao ===== */
@@ -240,6 +234,7 @@ function persist() {
 }
 
 const $ = (id) => document.getElementById(id);
+const view = $("view");
 function houseId(link) {
   if (!link) return "";
   const m = String(link).match(/permalink\/(\d+)/) ||
@@ -275,14 +270,16 @@ function esc(s) {
 }
 function normPhone(phone) {
   let d = String(phone || "").replace(/\D/g, "");
-  if (d.length === 9) d = "0" + d; // Sheet mất số 0 đầu
+  if (d.length === 9) d = "0" + d;
   return d;
 }
 function isLoai(h) { return /LOẠI/.test(h.note || ""); }
 function perm2(h) { return (h.priceNum != null && h.areaSqm) ? Math.round(h.priceNum * 1000 / h.areaSqm) + " tr/m²" : ""; }
+const FOOT = '<div class="foot">Dữ liệu đọc trực tiếp từ Google Sheet “Tìm nhà Hà Nội — Nino 2026”, tab “Nhà trên Facebook”. Lượt bỏ qua / lưu / sao lưu trên chính thiết bị đang xem.</div>';
 
 async function load() {
-  $("view").innerHTML = '<div class="state"><div class="big">Đang tải danh sách từ Google Sheet…</div>Vui lòng chờ giây lát.</div>';
+  view.className = "scrollable";
+  view.innerHTML = '<div class="inner"><div class="state"><div class="big">Đang tải danh sách từ Google Sheet…</div>Vui lòng chờ giây lát.</div></div>';
   const url = "https://docs.google.com/spreadsheets/d/" + SHEET_ID +
     "/gviz/tq?tqx=out:json&sheet=" + encodeURIComponent(TAB_NAME);
   try {
@@ -322,19 +319,17 @@ async function load() {
     });
     state.houses = houses;
     const now = new Date();
-    $("updated").textContent = "Đã tải lúc " + now.toLocaleTimeString("vi-VN") +
-      " ngày " + now.toLocaleDateString("vi-VN") + " — dữ liệu mới nhất từ Sheet";
+    $("updated").textContent = "Cập nhật " + now.toLocaleTimeString("vi-VN") + " · " + now.toLocaleDateString("vi-VN");
     render();
   } catch (e) {
     $("summary").textContent = "Không tải được dữ liệu";
-    $("view").innerHTML =
-      '<div class="state"><div class="big">Chưa đọc được Google Sheet</div>' +
+    view.innerHTML = '<div class="inner"><div class="state"><div class="big">Chưa đọc được Google Sheet</div>' +
       'Trang cần Sheet được bật chia sẻ <b>“Bất kỳ ai có đường liên kết đều xem được”</b>.<br><br>' +
-      '<button type="button" onclick="load()">Thử lại</button></div>';
+      '<button type="button" onclick="load()">Thử lại</button></div></div>';
   }
 }
 
-/* ===== Thẻ dùng chung ===== */
+/* ===== Thẻ dùng chung (list) ===== */
 function contactRow(h) {
   const d = normPhone(h.phone);
   return '<div class="actions">' +
@@ -372,160 +367,163 @@ function listCard(h, opts) {
     (opts.removable ? '<div class="mini"><a href="#" data-unsave="' + esc(h.id) + '">Bỏ khỏi Đã lưu</a></div>' : '') +
   '</article>';
 }
+function bindCardButtons() {
+  view.querySelectorAll("[data-star]").forEach(b => {
+    b.addEventListener("click", () => {
+      const id = b.dataset.star;
+      starred.has(id) ? starred.delete(id) : starred.add(id);
+      persist(); render();
+    });
+  });
+  view.querySelectorAll("[data-unsave]").forEach(a => {
+    a.addEventListener("click", (e) => {
+      e.preventDefault();
+      saved.delete(a.dataset.unsave);
+      persist(); render();
+    });
+  });
+}
 
-/* ===== Deck ===== */
-function deckQueue() {
+/* ===== Feed TikTok ===== */
+function feedQueue() {
   return state.houses.filter(h => !passed.has(h.id) && !saved.has(h.id));
 }
-function deckCard(h, behind) {
+function slideHTML(h) {
   const loai = isLoai(h);
   const pm = perm2(h);
-  const imgs = h.images;
-  const pi = Math.min(state.photoIdx, Math.max(0, imgs.length - 1));
-  const photo = imgs.length
-    ? '<img src="' + esc(imgs[pi]) + '" alt="Ảnh nhà" draggable="false">' +
-      (imgs.length > 1
-        ? '<button type="button" class="nav prev" data-nav="-1">‹</button>' +
-          '<button type="button" class="nav next" data-nav="1">›</button>' +
-          '<span class="count">' + (pi + 1) + '/' + imgs.length + '</span>' +
-          '<span class="dots">' + imgs.map((_, i) => '<i class="' + (i === pi ? "on" : "") + '"></i>').join("") + '</span>'
-        : '')
-    : '<div class="nophoto">Căn này chưa có ảnh<br>(em đang nạp dần từng tin)</div>';
-  return '<div class="dcard' + (behind ? " behind" : "") + '"' + (behind ? "" : ' id="topCard"') + '>' +
-    '<div class="photo">' + photo +
-      '<span class="stamp save" id="stampSave">LƯU ✓</span>' +
-      '<span class="stamp pass" id="stampPass">BỎ QUA</span>' +
-    '</div>' +
-    '<div class="dbody">' +
-      '<div><span class="dprice">' + (h.priceText ? esc(h.priceText) + ' tỷ' : 'Chưa rõ giá') + '</span>' +
-      (pm ? ' <span class="dperm2">· ' + pm + '</span>' : '') +
+  const d = normPhone(h.phone);
+  const strip = h.images.length
+    ? '<div class="strip" data-strip>' + h.images.map(src =>
+        '<div class="ph"><img src="' + esc(src) + '" alt="Ảnh nhà" draggable="false"></div>').join("") + '</div>' +
+      '<span class="pcount" data-count>1/' + h.images.length + '</span>' +
+      (h.images.length > 1 ? '<span class="pdots" data-dots>' +
+        h.images.map((_, i) => '<i class="' + (i === 0 ? "on" : "") + '"></i>').join("") + '</span>' : '')
+    : '<div class="strip"><div class="nophoto">Căn này chưa có ảnh<br>(em đang nạp dần từng tin)</div></div>';
+  return '<section class="slide" data-id="' + esc(h.id) + '" data-rank="' + h.rank + '">' +
+    '<div style="position:relative; flex:0 0 47%; display:flex; flex-direction:column">' + strip + '</div>' +
+    '<div class="sinfo">' +
+      '<div><span class="sprice">' + (h.priceText ? esc(h.priceText) + ' tỷ' : 'Chưa rõ giá') + '</span>' +
+      (pm ? ' <span class="sperm2">· ' + pm + '</span>' : '') +
       (loai ? '<span class="badge-loai">ĐÃ LOẠI</span>' : '') + '</div>' +
-      '<div class="dtitle">#' + h.rank + ' · ' + esc(h.title) + '</div>' +
-      '<div class="dmeta">' +
+      '<div class="stitle">#' + h.rank + ' · ' + esc(h.title) + '</div>' +
+      '<div class="smeta">' +
         (h.areaSqm ? '<span>' + h.areaSqm + ' m²</span>' : '') +
         (h.area ? '<span>' + esc(h.area) + '</span>' : '') +
         (h.postedDate ? '<span>Đăng: ' + esc(h.postedDate) + '</span>' : '') +
       '</div>' +
-      (h.note ? '<div class="dnote">' + esc(h.note) + '</div>' : '') +
-      contactRow(h) +
-    '</div></div>';
+      (h.note ? '<div class="snote">' + esc(h.note) + '</div>' : '') +
+      (h.comment ? '<div class="comment"><span class="lbl">COMMENT CỦA ANH</span>' + esc(h.comment) + '</div>' : '') +
+      '<div class="badges">' +
+        '<span class="bdg' + (h.daNhan ? " done" : "") + '">' + (h.daNhan ? "✓ Đã nhắn" : "Chưa nhắn") + '</span>' +
+        '<span class="bdg' + (h.daCheck ? " done" : "") + '">' + (h.daCheck ? "✓ Đã check" : "Chưa check") + '</span>' +
+      '</div>' +
+    '</div>' +
+    '<div class="sbar">' +
+      '<div class="contacts">' +
+        (h.link ? '<a class="a-fb" href="' + esc(h.link) + '" target="_blank" rel="noopener">Tin</a>' : '') +
+        (d ? '<a class="a-call" href="tel:' + d + '">Gọi</a>' : '') +
+        (d ? '<a class="a-zalo" href="https://zalo.me/' + d + '" target="_blank" rel="noopener">Zalo</a>' : '') +
+      '</div>' +
+      '<div class="decisions">' +
+        '<div class="dbtn pass"><button type="button" data-act="pass" data-id="' + esc(h.id) + '">✕</button><span>Bỏ qua</span></div>' +
+        '<div class="dbtn star' + (starred.has(h.id) ? " on" : "") + '"><button type="button" data-act="star" data-id="' + esc(h.id) + '">★</button><span>Sao</span></div>' +
+        '<div class="dbtn save' + (saved.has(h.id) ? " on" : "") + '"><button type="button" data-act="save" data-id="' + esc(h.id) + '">♥</button><span>Lưu</span></div>' +
+      '</div>' +
+    '</div>' +
+  '</section>';
 }
-function renderDeck() {
-  const q = deckQueue();
-  const total = state.houses.length;
-  const seen = total - q.length;
-  $("summary").innerHTML = "Đã xem <b>" + seen + "/" + total + "</b> · Đã lưu <b>" + saved.size +
-    "</b> · Có sao <b>" + starred.size + "</b>";
+function renderFeed() {
+  view.className = "";
+  const q = feedQueue();
   if (!q.length) {
-    $("view").innerHTML = '<div class="state"><div class="big">Đã xem hết danh sách 🎉</div>' +
-      'Anh đã vuốt qua toàn bộ các căn chưa lưu.<br><br>' +
-      '<button type="button" id="btnResetDeck">Xem lại từ đầu (chỉ xoá lượt bỏ qua)</button></div>';
-    $("btnResetDeck").addEventListener("click", () => {
-      passed.clear(); state.history = []; persist(); render();
-    });
+    view.className = "scrollable";
+    view.innerHTML = '<div class="inner"><div class="state"><div class="big">Đã xem hết danh sách 🎉</div>' +
+      'Các căn còn lại đang ở mục Đã lưu.<br><br>' +
+      '<button type="button" id="btnResetFeed">Xem lại từ đầu (xoá lượt bỏ qua)</button></div>' + FOOT + '</div>';
+    $("summary").innerHTML = "Đã lưu <b>" + saved.size + "</b> · Có sao <b>" + starred.size + "</b>";
+    $("btnResetFeed").addEventListener("click", () => { passed.clear(); persist(); render(); });
     return;
   }
-  const cur = q[0], next = q[1];
-  $("view").innerHTML = '<div class="deckwrap">' +
-    '<div class="deckmeta"><span>Căn #' + cur.rank + ' · còn ' + q.length + ' căn chưa xem</span>' +
-    (state.history.length ? '<button type="button" id="btnUndo">↩ Hoàn tác</button>' : '') + '</div>' +
-    '<div class="stage">' + (next ? deckCard(next, true) : '') + deckCard(cur, false) + '</div>' +
-    '<div class="swipebar">' +
-      '<button type="button" class="sbtn pass" id="btnPass" title="Bỏ qua">✕</button>' +
-      '<button type="button" class="sbtn star' + (starred.has(cur.id) ? " on" : "") + '" id="btnStar" title="Đánh dấu sao">★</button>' +
-      '<button type="button" class="sbtn save" id="btnSave" title="Lưu lại">♥</button>' +
-    '</div>' +
-    '<div class="swipelabels"><span>Vuốt trái · Bỏ qua</span><span>Sao · Quan tâm</span><span class="mid">Vuốt phải · Lưu</span></div>' +
+  view.innerHTML = '<div class="feed" id="feed">' +
+    q.map(slideHTML).join("") +
+    '<section class="slide endslide"><div><div class="big" style="font-size:17px; font-weight:600; margin-bottom:6px">Hết danh sách</div>' +
+    'Lướt lên để xem lại các căn trước, hoặc mở mục Danh sách.<br><br>' +
+    '<button type="button" id="btnResetFeed2">Xem lại từ đầu</button></div></section>' +
   '</div>';
-  $("btnPass").addEventListener("click", () => decide("pass"));
-  $("btnSave").addEventListener("click", () => decide("save"));
-  $("btnStar").addEventListener("click", () => {
-    starred.has(cur.id) ? starred.delete(cur.id) : starred.add(cur.id);
-    persist(); render();
+  const feed = $("feed");
+  const updateSummary = () => {
+    const cur = q[Math.min(state.feedIdx, q.length - 1)];
+    if (cur) $("summary").innerHTML = "Đang xem căn <b>#" + cur.rank + "</b> · còn <b>" + q.length +
+      "</b> căn · Đã lưu <b>" + saved.size + "</b> · Sao <b>" + starred.size + "</b>";
+  };
+  updateSummary();
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(en => {
+      if (en.isIntersecting) {
+        const idx = [...feed.children].indexOf(en.target);
+        if (idx >= 0 && idx < q.length) { state.feedIdx = idx; updateSummary(); }
+      }
+    });
+  }, { root: feed, threshold: 0.6 });
+  [...feed.children].forEach(s => io.observe(s));
+  feed.querySelectorAll("[data-strip]").forEach(strip => {
+    const wrap = strip.parentElement;
+    const count = wrap.querySelector("[data-count]");
+    const dots = wrap.querySelector("[data-dots]");
+    strip.addEventListener("scroll", () => {
+      const i = Math.round(strip.scrollLeft / strip.clientWidth);
+      if (count) count.textContent = (i + 1) + "/" + strip.children.length;
+      if (dots) [...dots.children].forEach((el, j) => el.classList.toggle("on", j === i));
+    }, { passive: true });
   });
-  const undo = $("btnUndo");
-  if (undo) undo.addEventListener("click", undoLast);
-  document.querySelectorAll("[data-nav]").forEach(b => {
-    b.addEventListener("click", (e) => {
-      e.stopPropagation();
-      const n = cur.images.length;
-      if (n > 1) { state.photoIdx = (state.photoIdx + Number(b.dataset.nav) + n) % n; render(); }
+  feed.querySelectorAll("[data-act]").forEach(b => {
+    b.addEventListener("click", () => {
+      const id = b.dataset.id, act = b.dataset.act;
+      if (act === "star") {
+        starred.has(id) ? starred.delete(id) : starred.add(id);
+        persist();
+        b.parentElement.classList.toggle("on", starred.has(id));
+        updateSummary();
+      } else if (act === "save") {
+        saved.has(id) ? saved.delete(id) : saved.add(id);
+        persist();
+        b.parentElement.classList.toggle("on", saved.has(id));
+        updateSummary();
+      } else if (act === "pass") {
+        const idx = state.feedIdx;
+        passed.add(id);
+        persist();
+        renderFeed();
+        const f2 = $("feed");
+        if (f2) {
+          const target = f2.children[Math.min(idx, f2.children.length - 1)];
+          if (target) target.scrollIntoView();
+        }
+      }
     });
   });
-  attachSwipe(cur);
-}
-function decide(kind) {
-  const q = deckQueue();
-  if (!q.length) return;
-  const cur = q[0];
-  const card = $("topCard");
-  const done = () => {
-    if (kind === "pass") passed.add(cur.id); else saved.add(cur.id);
-    state.history.push({ id: cur.id, kind });
-    state.photoIdx = 0;
-    persist(); render();
-  };
-  if (card) {
-    card.style.transition = "transform .28s ease, opacity .28s ease";
-    card.style.transform = "translateX(" + (kind === "pass" ? "-120" : "120") + "vw) rotate(" + (kind === "pass" ? "-10" : "10") + "deg)";
-    card.style.opacity = "0.4";
-    setTimeout(done, 240);
-  } else done();
-}
-function undoLast() {
-  const last = state.history.pop();
-  if (!last) return;
-  if (last.kind === "pass") passed.delete(last.id); else saved.delete(last.id);
-  state.photoIdx = 0;
-  persist(); render();
-}
-function attachSwipe(cur) {
-  const card = $("topCard");
-  if (!card) return;
-  const saveStamp = $("stampSave"), passStamp = $("stampPass");
-  let sx = 0, dx = 0, dragging = false;
-  card.addEventListener("pointerdown", (e) => {
-    if (e.target.closest("a,button")) return;
-    dragging = true; sx = e.clientX; dx = 0;
-    card.style.transition = "none";
-    card.setPointerCapture(e.pointerId);
-  });
-  card.addEventListener("pointermove", (e) => {
-    if (!dragging) return;
-    dx = e.clientX - sx;
-    card.style.transform = "translateX(" + dx + "px) rotate(" + (dx / 18) + "deg)";
-    if (saveStamp) saveStamp.style.opacity = dx > 24 ? Math.min(1, dx / 110) : 0;
-    if (passStamp) passStamp.style.opacity = dx < -24 ? Math.min(1, -dx / 110) : 0;
-  });
-  const end = () => {
-    if (!dragging) return;
-    dragging = false;
-    if (dx > 95) return decide("save");
-    if (dx < -95) return decide("pass");
-    card.style.transition = "transform .22s ease";
-    card.style.transform = "";
-    if (saveStamp) saveStamp.style.opacity = 0;
-    if (passStamp) passStamp.style.opacity = 0;
-  };
-  card.addEventListener("pointerup", end);
-  card.addEventListener("pointercancel", end);
+  if (state.feedIdx > 0 && feed.children[state.feedIdx]) {
+    feed.children[state.feedIdx].scrollIntoView();
+  }
 }
 
 /* ===== Đã lưu ===== */
 function renderSaved() {
+  view.className = "scrollable";
   const list = state.houses.filter(h => saved.has(h.id));
   const stars = state.houses.filter(h => starred.has(h.id) && !saved.has(h.id));
   $("summary").innerHTML = "Đã lưu <b>" + list.length + "</b> căn · Có sao <b>" + starred.size + "</b>";
-  let html = "";
+  let html = '<div class="inner">';
   if (!list.length && !stars.length) {
-    html = '<div class="state"><div class="big">Chưa lưu căn nào</div>Vuốt phải (hoặc bấm ♥) ở mục “Vuốt xem” để lưu lại căn ưng ý. Bấm ★ để đánh dấu sao các tin quan tâm.</div>';
+    html += '<div class="state"><div class="big">Chưa lưu căn nào</div>Ở mục “Xem”, bấm ♥ ở góc dưới để lưu căn ưng ý, ★ để đánh dấu sao tin quan tâm.</div>';
   }
   if (list.length) html += list.map(h => listCard(h, { removable: true })).join("");
   if (stars.length) {
     html += '<div class="state" style="padding:14px"><div class="big">Tin có sao nhưng chưa lưu</div></div>' +
       stars.map(h => listCard(h, {})).join("");
   }
-  $("view").innerHTML = html;
+  html += FOOT + '</div>';
+  view.innerHTML = html;
   bindCardButtons();
 }
 
@@ -546,11 +544,12 @@ function visibleList() {
   return list;
 }
 function renderList() {
+  view.className = "scrollable";
   const list = visibleList();
   const areas = [...new Set(state.houses.map(h => h.area).filter(Boolean))].sort();
-  $("summary").innerHTML = "Tổng <b>" + state.houses.length + "</b> căn · Đang hiển thị <b>" + list.length +
-    "</b> · Đã lưu <b>" + saved.size + "</b> · Có sao <b>" + starred.size + "</b>";
-  $("view").innerHTML =
+  $("summary").innerHTML = "Tổng <b>" + state.houses.length + "</b> căn · Hiển thị <b>" + list.length +
+    "</b> · Đã lưu <b>" + saved.size + "</b> · Sao <b>" + starred.size + "</b>";
+  view.innerHTML = '<div class="inner">' +
     '<div class="searchrow"><input type="search" id="q" placeholder="Tìm theo tiêu đề, khu vực, ghi chú…" autocomplete="off" value="' + esc(state.q) + '">' +
     '<button id="btnFilters" type="button">Bộ lọc</button>' +
     '<button id="btnReload" type="button" title="Tải lại từ Google Sheet">↻</button></div>' +
@@ -566,7 +565,8 @@ function renderList() {
       '<div class="row"><span class="toggle' + (state.hideLoai ? " on" : "") + '" id="tHideLoai">Ẩn căn đã loại</span></div>' +
     '</div>' +
     (list.length ? list.map(h => listCard(h, {})).join("")
-      : '<div class="state"><div class="big">Không có căn nào khớp bộ lọc</div>Thử nới điều kiện lọc xem sao.</div>');
+      : '<div class="state"><div class="big">Không có căn nào khớp bộ lọc</div>Thử nới điều kiện lọc xem sao.</div>') +
+    FOOT + '</div>';
   $("q").addEventListener("input", (e) => { state.q = e.target.value; renderListKeep(); });
   $("btnFilters").addEventListener("click", () => { state.filtersOpen = !state.filtersOpen; $("filters").classList.toggle("open", state.filtersOpen); });
   $("btnReload").addEventListener("click", load);
@@ -577,39 +577,34 @@ function renderList() {
   bindCardButtons();
 }
 function renderListKeep() {
-  const y = window.scrollY;
+  const y = view.scrollTop;
   renderList();
-  window.scrollTo(0, y);
-}
-function bindCardButtons() {
-  document.querySelectorAll("[data-star]").forEach(b => {
-    b.addEventListener("click", () => {
-      const id = b.dataset.star;
-      starred.has(id) ? starred.delete(id) : starred.add(id);
-      persist(); render();
-    });
-  });
-  document.querySelectorAll("[data-unsave]").forEach(a => {
-    a.addEventListener("click", (e) => {
-      e.preventDefault();
-      saved.delete(a.dataset.unsave);
-      persist(); render();
-    });
-  });
+  view.scrollTop = y;
 }
 
 /* ===== Điều hướng tab ===== */
 function render() {
-  $("tabDeck").classList.toggle("on", state.tab === "deck");
+  $("tabFeed").classList.toggle("on", state.tab === "feed");
   $("tabSaved").classList.toggle("on", state.tab === "saved");
   $("tabList").classList.toggle("on", state.tab === "list");
-  if (state.tab === "deck") renderDeck();
+  if (state.tab === "feed") renderFeed();
   else if (state.tab === "saved") renderSaved();
   else renderList();
 }
-$("tabDeck").addEventListener("click", () => { state.tab = "deck"; state.photoIdx = 0; render(); });
+$("tabFeed").addEventListener("click", () => { state.tab = "feed"; render(); });
 $("tabSaved").addEventListener("click", () => { state.tab = "saved"; render(); });
 $("tabList").addEventListener("click", () => { state.tab = "list"; render(); });
+document.addEventListener("keydown", (e) => {
+  if (state.tab !== "feed") return;
+  const feed = $("feed");
+  if (!feed) return;
+  if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+    e.preventDefault();
+    const next = state.feedIdx + (e.key === "ArrowDown" ? 1 : -1);
+    const t = feed.children[Math.max(0, Math.min(next, feed.children.length - 1))];
+    if (t) t.scrollIntoView({ behavior: "smooth" });
+  }
+});
 
 load();
 </script>
