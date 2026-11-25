@@ -98,11 +98,12 @@
     border-top:1px solid var(--border); background:var(--card);
   }
   .contacts{display:flex; gap:7px; flex:1; min-width:0}
-  .contacts a{
+  .contacts a, .contacts button{
     text-decoration:none; font-weight:600; font-size:14px;
     border-radius:10px; padding:11px 10px; min-height:46px;
     display:flex; align-items:center; justify-content:center; white-space:nowrap;
   }
+  .a-copy{background:var(--card); color:var(--text); border:1px solid var(--border); cursor:pointer; font-family:inherit}
   .a-fb{background:var(--accent); color:#fff}
   .a-call{background:var(--chip); color:var(--text); border:1px solid var(--border)}
   .a-zalo{background:var(--zalo); color:#fff}
@@ -169,7 +170,7 @@
   .bdg{font-size:13px; border-radius:999px; padding:4px 11px; background:var(--chip); color:var(--muted)}
   .bdg.done{background:var(--ok-soft); color:var(--ok); font-weight:600}
   .actions{display:flex; gap:8px; margin-top:11px}
-  .actions a{
+  .actions a, .actions button{
     flex:1; text-align:center; text-decoration:none; font-weight:600;
     border-radius:10px; padding:12px 8px; min-height:48px; font-size:14.5px;
     display:flex; align-items:center; justify-content:center;
@@ -337,6 +338,7 @@ function contactRow(h) {
     (h.link ? '<a class="a-fb" href="' + esc(h.link) + '" target="_blank" rel="noopener">Mở tin</a>' : '') +
     (d ? '<a class="a-call" href="tel:' + d + '">Gọi ' + esc(h.phone) + '</a>' : '') +
     (d ? '<a class="a-zalo" href="https://zalo.me/' + d + '" target="_blank" rel="noopener">Zalo</a>' : '') +
+    (h.link ? '<button type="button" class="a-copy" data-copy="' + esc(h.link) + '">Chép link</button>' : '') +
   '</div>';
 }
 function listCard(h, opts) {
@@ -385,6 +387,25 @@ function bindCardButtons() {
   });
 }
 
+/* ===== Chép link tin (để dán khi nhắn hỏi người bán) ===== */
+document.addEventListener("click", async (e) => {
+  const b = e.target.closest("[data-copy]");
+  if (!b) return;
+  const url = b.getAttribute("data-copy");
+  let ok = false;
+  try { await navigator.clipboard.writeText(url); ok = true; }
+  catch (_) {
+    const ta = document.createElement("textarea");
+    ta.value = url; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    try { ok = document.execCommand("copy"); } catch (__) {}
+    ta.remove();
+  }
+  const old = b.textContent;
+  b.textContent = ok ? "Đã chép ✓" : "Chép lỗi";
+  setTimeout(() => { b.textContent = old; }, 1400);
+});
+
 /* ===== Feed TikTok ===== */
 function feedQueue() {
   const q = state.houses.filter(h => !passed.has(h.id) && !saved.has(h.id));
@@ -426,6 +447,7 @@ function slideHTML(h) {
         (h.link ? '<a class="a-fb" href="' + esc(h.link) + '" target="_blank" rel="noopener">Tin</a>' : '') +
         (d ? '<a class="a-call" href="tel:' + d + '">Gọi</a>' : '') +
         (d ? '<a class="a-zalo" href="https://zalo.me/' + d + '" target="_blank" rel="noopener">Zalo</a>' : '') +
+        (h.link ? '<button type="button" class="a-copy" data-copy="' + esc(h.link) + '">Chép link</button>' : '') +
       '</div>' +
       '<div class="decisions">' +
         '<div class="dbtn pass"><button type="button" data-act="pass" data-id="' + esc(h.id) + '">✕</button><span>Bỏ qua</span></div>' +
