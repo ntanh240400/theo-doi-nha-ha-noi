@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Theo dõi nhà Hà Nội</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --card:#ffffff; --text:#1a1d21; --muted:#6b7280;
+    --border:#e3e6ea; --accent:#0b7285; --accent-soft:#e6f4f7;
+    --danger:#c92a2a; --danger-soft:#fdecec; --ok:#2b8a3e; --ok-soft:#e6f4ea;
+    --chip:#eef1f4;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#121417; --card:#1c1f24; --text:#eceff3; --muted:#9aa3ad;
+      --border:#2c3038; --accent:#3bc9db; --accent-soft:#12333a;
+      --danger:#ff8787; --danger-soft:#3d1d1d; --ok:#69db7c; --ok-soft:#17351f;
+      --chip:#262a31;
+    }
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+  html,body{margin:0; padding:0}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    font-size:16px; line-height:1.45;
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  header{
+    position:sticky; top:0; z-index:10;
+    background:var(--card); border-bottom:1px solid var(--border);
+    padding:10px 14px calc(10px + 2px);
+  }
+  header h1{font-size:18px; margin:0 0 2px}
+  .summary{font-size:13px; color:var(--muted); display:flex; flex-wrap:wrap; gap:4px 12px}
+  .summary b{color:var(--text)}
+  .updated{font-size:12px; color:var(--muted); margin-top:2px}
+  .searchrow{display:flex; gap:8px; margin-top:10px}
+  .searchrow input[type=search]{
+    flex:1; min-width:0; font-size:16px; padding:11px 12px;
+    border:1px solid var(--border); border-radius:10px;
+    background:var(--bg); color:var(--text);
+  }
+  button{
+    font:inherit; cursor:pointer; border:1px solid var(--border);
+    background:var(--card); color:var(--text); border-radius:10px;
+    padding:10px 14px; min-height:44px;
+  }
+  button:active{transform:scale(.98)}
+  .filters{
+    display:none; padding:12px 14px 4px; background:var(--card);
+    border-bottom:1px solid var(--border);
+  }
+  .filters.open{display:block}
+  .filters .row{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px; align-items:center}
+  .filters label{font-size:13px; color:var(--muted); width:100%}
+  select, .filters input[type=number]{
+    font-size:16px; padding:9px 10px; border:1px solid var(--border);
+    border-radius:9px; background:var(--bg); color:var(--text); max-width:100%;
+  }
+  .toggle{
+    display:inline-flex; align-items:center; gap:7px;
+    background:var(--chip); border:1px solid var(--border);
+    border-radius:999px; padding:8px 13px; font-size:14px; min-height:40px;
+    cursor:pointer; user-select:none;
+  }
+  .toggle.on{background:var(--accent-soft); border-color:var(--accent); color:var(--accent); font-weight:600}
+  main{padding:12px 12px 30px; max-width:860px; margin:0 auto}
+  .card{
+    background:var(--card); border:1px solid var(--border); border-radius:14px;
+    padding:13px 14px; margin-bottom:11px;
+  }
+  .card.loai{border-color:var(--danger); background:linear-gradient(0deg, var(--danger-soft), var(--danger-soft)), var(--card)}
+  .top{display:flex; align-items:flex-start; gap:10px}
+  .rank{
+    flex:0 0 auto; background:var(--accent-soft); color:var(--accent);
+    font-weight:700; font-size:13px; border-radius:8px; padding:3px 8px; margin-top:2px;
+  }
+  .price{font-size:21px; font-weight:800; line-height:1.15}
+  .perm2{font-size:13px; color:var(--muted); font-weight:500}
+  .badge-loai{
+    margin-left:auto; flex:0 0 auto; background:var(--danger); color:#fff;
+    font-size:12px; font-weight:700; border-radius:7px; padding:3px 8px;
+  }
+  .gallery{
+    display:flex; gap:8px; overflow-x:auto; padding:10px 0 2px;
+    scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;
+  }
+  .gallery img{
+    height:180px; width:auto; max-width:85%; object-fit:cover; flex:0 0 auto;
+    border-radius:10px; scroll-snap-align:start; background:var(--chip);
+  }
+  .title{font-size:16px; font-weight:600; margin:8px 0 4px}
+  .meta{font-size:14px; color:var(--muted); display:flex; flex-wrap:wrap; gap:3px 12px}
+  .note{font-size:15px; margin-top:8px; white-space:pre-wrap}
+  .comment{
+    font-size:14px; margin-top:8px; background:var(--accent-soft);
+    border-radius:9px; padding:8px 10px; white-space:pre-wrap;
+  }
+  .comment .lbl{font-size:12px; font-weight:700; color:var(--accent); display:block; margin-bottom:2px}
+  .badges{display:flex; gap:7px; margin-top:10px; flex-wrap:wrap}
+  .bdg{font-size:13px; border-radius:999px; padding:4px 11px; background:var(--chip); color:var(--muted)}
+  .bdg.done{background:var(--ok-soft); color:var(--ok); font-weight:600}
+  .actions{display:flex; gap:8px; margin-top:11px}
+  .actions a{
+    flex:1; text-align:center; text-decoration:none; font-weight:600;
+    border-radius:10px; padding:12px 8px; min-height:48px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .a-fb{background:var(--accent); color:#fff}
+  .a-call{background:var(--chip); color:var(--text); border:1px solid var(--border)}
+  .a-zalo{background:#0068ff; color:#fff}
+  .state{
+    text-align:center; color:var(--muted); padding:44px 20px; font-size:15px;
+  }
+  .state .big{font-size:17px; color:var(--text); font-weight:600; margin-bottom:6px}
+  footer{max-width:860px; margin:0 auto; padding:0 16px 34px; color:var(--muted); font-size:12.5px}
+  code{background:var(--chip); padding:1px 5px; border-radius:5px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Theo dõi nhà Hà Nội</h1>
+  <div class="summary" id="summary">Đang tải dữ liệu…</div>
+  <div class="updated" id="updated"></div>
+  <div class="searchrow">
+    <input type="search" id="q" placeholder="Tìm theo tiêu đề, khu vực, ghi chú…" autocomplete="off">
+    <button id="btnFilters" type="button">Bộ lọc</button>
+    <button id="btnReload" type="button" title="Tải lại từ Google Sheet">↻</button>
+  </div>
+</header>
+
+<div class="filters" id="filters">
+  <div class="row">
+    <label for="fArea">Khu vực</label>
+    <select id="fArea"><option value="">Tất cả khu vực</option></select>
+  </div>
+  <div class="row">
+    <label for="fPrice">Giá tối đa (tỷ)</label>
+    <input type="number" id="fPrice" min="0" step="0.1" placeholder="VD: 7.5" inputmode="decimal">
+  </div>
+  <div class="row">
+    <label for="fSort">Sắp xếp</label>
+    <select id="fSort">
+      <option value="rank">Thứ hạng trong Sheet</option>
+      <option value="priceAsc">Giá tăng dần</option>
+      <option value="priceDesc">Giá giảm dần</option>
+      <option value="perm2">Giá/m² tăng dần</option>
+    </select>
+  </div>
+  <div class="row">
+    <span class="toggle" id="tHideLoai">Ẩn căn đã loại</span>
+    <span class="toggle" id="tOnlyOk">Chỉ căn chưa loại</span>
+  </div>
+</div>
+
+<main id="list">
+  <div class="state"><div class="big">Đang tải danh sách từ Google Sheet…</div>Vui lòng chờ giây lát.</div>
+</main>
+
+<footer>
+  Dữ liệu đọc trực tiếp từ Google Sheet “Tìm nhà Hà Nội — Nino 2026”, tab “Nhà trên Facebook”.
+  Tick Đã nhắn / Đã check và comment hiển thị theo Sheet (chỉ xem). Cập nhật Sheet là trang tự cập nhật theo.
+</footer>
+
+<script>
+"use strict";
+/* ====== CẤU HÌNH ====== */
+const SHEET_ID = "1Te44C8dwth9vSWuEX1BxI0s3V_sWi-OgSajlrIZtEa8";
+const TAB_NAME = "Nhà trên Facebook";
+/* Cột trong Sheet: A Giá | B Ngày đăng | C Tiêu đề | D Diện tích | E Khu vực |
+   F SĐT | G Ghi chú | H Link | I Đã nhắn | J Đã check | K Comment */
+
+const state = { houses: [], q: "", area: "", maxPrice: null, sort: "rank", hideLoai: false };
+let IMAGES = {}; // { "<id tin>": ["images/<id>/1.jpg", ...] } — nạp từ images.json cùng repo
+
+function houseId(link) {
+  if (!link) return "";
+  const m = String(link).match(/permalink\/(\d+)/) ||
+            String(link).match(/marketplace\/item\/(\d+)/) ||
+            String(link).match(/fbid=(\d+)/);
+  return m ? m[1] : String(link);
+}
+fetch("images.json", { cache: "no-store" })
+  .then(r => r.ok ? r.json() : {})
+  .then(j => { IMAGES = j || {}; if (state.houses.length) render(); })
+  .catch(() => {});
+
+const $ = (id) => document.getElementById(id);
+const fmtTy = (n) => {
+  if (n == null || isNaN(n)) return "";
+  return String(Math.round(n * 100) / 100).replace(".", ",");
+};
+function parsePrice(text) {
+  if (text == null) return null;
+  const m = String(text).replace(/\s/g, "").match(/(\d+(?:[.,]\d+)?)/);
+  if (!m) return null;
+  const v = parseFloat(m[1].replace(",", "."));
+  return isNaN(v) ? null : v;
+}
+function cellVal(cell) {
+  if (!cell) return "";
+  if (cell.f != null) return String(cell.f);
+  if (cell.v == null) return "";
+  if (typeof cell.v === "string" && cell.v.startsWith("Date(")) {
+    const p = cell.v.match(/\d+/g).map(Number);
+    if (p.length >= 3) {
+      const d = new Date(p[0], p[1], p[2]);
+      const dd = String(d.getDate()).padStart(2, "0");
+      const mm = String(d.getMonth() + 1).padStart(2, "0");
+      return dd + "/" + mm + "/" + d.getFullYear();
+    }
+  }
+  return String(cell.v);
+}
+function cellBool(cell) {
+  return !!(cell && (cell.v === true || String(cell.v).toLowerCase() === "true"));
+}
+function esc(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+function telHref(phone) {
+  let digits = String(phone || "").replace(/\D/g, "");
+  if (digits.length === 9) digits = "0" + digits; // Sheet bị mất số 0 đầu
+  return digits ? "tel:" + digits : "";
+}
+
+async function load() {
+  $("list").innerHTML = '<div class="state"><div class="big">Đang tải danh sách từ Google Sheet…</div>Vui lòng chờ giây lát.</div>';
+  const url = "https://docs.google.com/spreadsheets/d/" + SHEET_ID +
+    "/gviz/tq?tqx=out:json&sheet=" + encodeURIComponent(TAB_NAME);
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const text = await res.text();
+    const start = text.indexOf("{");
+    const end = text.lastIndexOf("}");
+    if (start < 0 || end < 0) throw new Error("bad response");
+    const data = JSON.parse(text.slice(start, end + 1));
+    if (!data.table || !data.table.rows) throw new Error("no table");
+    const houses = [];
+    data.table.rows.forEach((row, idx) => {
+      const c = row.c || [];
+      const title = cellVal(c[2]);
+      const link = cellVal(c[7]);
+      if (idx === 0 && /tiêu đề/i.test(title)) return; // dòng tiêu đề
+      if (!title && !link) return;
+      const priceText = cellVal(c[0]);
+      const areaSqmRaw = cellVal(c[3]);
+      const areaSqm = parseFloat(String(areaSqmRaw).replace(",", "."));
+      houses.push({
+        rank: houses.length + 1,
+        priceText: priceText,
+        priceNum: parsePrice(priceText),
+        postedDate: cellVal(c[1]),
+        title: title,
+        areaSqm: isNaN(areaSqm) ? null : areaSqm,
+        area: cellVal(c[4]),
+        phone: cellVal(c[5]),
+        note: cellVal(c[6]),
+        link: link,
+        daNhan: cellBool(c[8]),
+        daCheck: cellBool(c[9]),
+        comment: cellVal(c[10])
+      });
+    });
+    state.houses = houses;
+    fillAreas();
+    const now = new Date();
+    $("updated").textContent = "Đã tải lúc " + now.toLocaleTimeString("vi-VN") +
+      " ngày " + now.toLocaleDateString("vi-VN") + " — dữ liệu mới nhất từ Sheet";
+    render();
+  } catch (e) {
+    $("summary").textContent = "Không tải được dữ liệu";
+    $("list").innerHTML =
+      '<div class="state"><div class="big">Chưa đọc được Google Sheet</div>' +
+      'Trang cần Sheet được bật chế độ chia sẻ <b>“Bất kỳ ai có đường liên kết đều xem được”</b> ' +
+      '(Share → General access → Anyone with the link → Viewer).<br><br>' +
+      '<button type="button" onclick="load()">Thử lại</button></div>';
+  }
+}
+
+function fillAreas() {
+  const sel = $("fArea");
+  const cur = sel.value;
+  const areas = [...new Set(state.houses.map(h => h.area).filter(Boolean))].sort();
+  sel.innerHTML = '<option value="">Tất cả khu vực</option>' +
+    areas.map(a => '<option value="' + esc(a) + '">' + esc(a) + '</option>').join("");
+  if (areas.includes(cur)) sel.value = cur;
+}
+
+function visible() {
+  let list = state.houses.slice();
+  const q = state.q.trim().toLowerCase();
+  if (q) {
+    list = list.filter(h =>
+      (h.title + " " + h.area + " " + h.note + " " + h.phone).toLowerCase().includes(q));
+  }
+  if (state.area) list = list.filter(h => h.area === state.area);
+  if (state.maxPrice != null) {
+    list = list.filter(h => h.priceNum != null && h.priceNum <= state.maxPrice);
+  }
+  if (state.hideLoai) list = list.filter(h => !/LOẠI/.test(h.note || ""));
+  if (state.sort === "priceAsc") list.sort((a, b) => (a.priceNum ?? 1e9) - (b.priceNum ?? 1e9));
+  if (state.sort === "priceDesc") list.sort((a, b) => (b.priceNum ?? -1) - (a.priceNum ?? -1));
+  if (state.sort === "perm2") {
+    const pm = (h) => (h.priceNum != null && h.areaSqm) ? h.priceNum * 1000 / h.areaSqm : 1e12;
+    list.sort((a, b) => pm(a) - pm(b));
+  }
+  return list;
+}
+
+function render() {
+  const list = visible();
+  const total = state.houses.length;
+  const nhan = state.houses.filter(h => h.daNhan).length;
+  const check = state.houses.filter(h => h.daCheck).length;
+  $("summary").innerHTML =
+    "Tổng <b>" + total + "</b> căn · Đã nhắn <b>" + nhan + "</b> · Đã check <b>" + check +
+    "</b> · Đang hiển thị <b>" + list.length + "</b>";
+  if (!list.length) {
+    $("list").innerHTML = '<div class="state"><div class="big">Không có căn nào khớp bộ lọc</div>Thử nới điều kiện lọc xem sao.</div>';
+    return;
+  }
+  $("list").innerHTML = list.map(h => {
+    const loai = /LOẠI/.test(h.note || "");
+    const perm2 = (h.priceNum != null && h.areaSqm)
+      ? Math.round(h.priceNum * 1000 / h.areaSqm) + " tr/m²" : "";
+    const priceLabel = h.priceText ? esc(h.priceText) + " tỷ" : "Chưa rõ giá";
+    const tel = telHref(h.phone);
+    const digits = tel ? tel.slice(4) : "";
+    return '<article class="card' + (loai ? " loai" : "") + '">' +
+      '<div class="top"><span class="rank">#' + h.rank + '</span>' +
+      '<div><span class="price">' + priceLabel + '</span>' +
+      (perm2 ? ' <span class="perm2">· ' + perm2 + '</span>' : '') + '</div>' +
+      (loai ? '<span class="badge-loai">ĐÃ LOẠI</span>' : '') + '</div>' +
+      ((IMAGES[houseId(h.link)] || []).length
+        ? '<div class="gallery">' + IMAGES[houseId(h.link)].map(src =>
+            '<img loading="lazy" src="' + esc(src) + '" alt="Ảnh nhà">').join("") + '</div>'
+        : '') +
+      '<div class="title">' + esc(h.title) + '</div>' +
+      '<div class="meta">' +
+        (h.areaSqm ? '<span>' + h.areaSqm + ' m²</span>' : '') +
+        (h.area ? '<span>' + esc(h.area) + '</span>' : '') +
+        (h.postedDate ? '<span>Đăng: ' + esc(h.postedDate) + '</span>' : '') +
+      '</div>' +
+      (h.note ? '<div class="note">' + esc(h.note) + '</div>' : '') +
+      (h.comment ? '<div class="comment"><span class="lbl">COMMENT CỦA ANH</span>' + esc(h.comment) + '</div>' : '') +
+      '<div class="badges">' +
+        '<span class="bdg' + (h.daNhan ? " done" : "") + '">' + (h.daNhan ? "✓ Đã nhắn" : "Chưa nhắn") + '</span>' +
+        '<span class="bdg' + (h.daCheck ? " done" : "") + '">' + (h.daCheck ? "✓ Đã check" : "Chưa check") + '</span>' +
+      '</div>' +
+      '<div class="actions">' +
+        (h.link ? '<a class="a-fb" href="' + esc(h.link) + '" target="_blank" rel="noopener">Mở tin Facebook</a>' : '') +
+        (tel ? '<a class="a-call" href="' + tel + '">Gọi ' + esc(h.phone) + '</a>' : '') +
+        (digits ? '<a class="a-zalo" href="https://zalo.me/' + digits + '" target="_blank" rel="noopener">Zalo</a>' : '') +
+      '</div>' +
+    '</article>';
+  }).join("");
+}
+
+$("q").addEventListener("input", (e) => { state.q = e.target.value; render(); });
+$("fArea").addEventListener("change", (e) => { state.area = e.target.value; render(); });
+$("fPrice").addEventListener("input", (e) => {
+  const v = parseFloat(e.target.value);
+  state.maxPrice = isNaN(v) ? null : v; render();
+});
+$("fSort").addEventListener("change", (e) => { state.sort = e.target.value; render(); });
+$("btnFilters").addEventListener("click", () => $("filters").classList.toggle("open"));
+$("btnReload").addEventListener("click", load);
+$("tHideLoai").addEventListener("click", (e) => {
+  state.hideLoai = !state.hideLoai;
+  e.currentTarget.classList.toggle("on", state.hideLoai);
+  render();
+});
+$("tOnlyOk").addEventListener("click", (e) => {
+  const on = e.currentTarget.classList.toggle("on");
+  state.hideLoai = on;
+  $("tHideLoai").classList.toggle("on", on);
+  render();
+});
+
+load();
+</script>
+</body>
+</html>
