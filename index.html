@@ -386,7 +386,9 @@ function bindCardButtons() {
 
 /* ===== Feed TikTok ===== */
 function feedQueue() {
-  return state.houses.filter(h => !passed.has(h.id) && !saved.has(h.id));
+  const q = state.houses.filter(h => !passed.has(h.id) && !saved.has(h.id));
+  // Căn đã LOẠI đẩy xuống cuối luồng: chỉ hiện sau khi lướt hết các căn còn lại
+  return q.filter(h => !isLoai(h)).concat(q.filter(h => isLoai(h)));
 }
 function slideHTML(h) {
   const loai = isLoai(h);
